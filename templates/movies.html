@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<head>
+  <title>Filmy</title>
+</head>
+{% endblock %}
+
+{% block body %}
+  <div>
+    <h1>Witajcie na stronie z filmami!</h1>
+  </div>
+  <div>
+    {% if user_id == 1 %}
+      <table class="table table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">Tytuł</th>
+          <th scope="col">Opis</th>
+          <th scope="col">Ocena</th>
+          <th scope="col">Akcja</th>
+        </tr>
+      </thead>
+      <tbody>
+        <form action="#" method="post">
+          <tr>
+            <th scope="row"><input type="text" name="name"></th>
+            <td><input type="text" name="description"></td>
+            <td><input type="number" name="rate" step="0.5" min="0" max="10"></td>
+            <td><input type="submit" name="add_movie" value="Dodaj"></td>
+          </tr>
+        </form>
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+  <div>
+    <table class="table table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Tytuł</th>
+          <th scope="col">Opis</th>
+          <th scope="col">Ocena</th>
+          {% if user_id == 1 %}
+            <th scope="col">Akcja</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for movie in movies %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ movie.title }}</td>
+            <td>{{ movie.description }}</td>
+            <td>{{ movie.rate }}</td>
+            {% if user_id == 1 %}
+              <th scope="col">Usuń</th>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

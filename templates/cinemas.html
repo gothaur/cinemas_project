@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<head>
+  <title>Filmy</title>
+</head>
+{% endblock %}
+
+{% block body %}
+  <div>
+    <h1>Witajcie na stronie z Kinami!</h1>
+  </div>
+
+  <div>
+    {% if user_id == 1 %}
+      <table class="table table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">Nazwa</th>
+          <th scope="col">Adres</th>
+          <th scope="col">Liczba miejsc</th>
+          <th scope="col">Akcja</th>
+        </tr>
+      </thead>
+      <tbody>
+        <form action="#" method="post">
+          <tr>
+            <th scope="row"><input type="text" name="name"></th>
+            <td><input type="text" name="address"></td>
+            <td><input type="number" name="sits" step="1" min="0" max="450"></td>
+            <td><input type="submit" name="add_cinema" value="Dodaj"></td>
+          </tr>
+        </form>
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+
+  <div>
+    <table class="table table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Nazwa</th>
+          <th scope="col">Adres</th>
+          <th scope="col">Liczba miejsc</th>
+          {% if user_id == 1 %}
+            <th scope="col">Akcja</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for cinema in cinemas %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td><a href="/cinema/{{ cinema.get_cinema_id() }}">{{ cinema.name }}</a></td>
+            <td>{{ cinema.address }}</td>
+            <td>{{ cinema.sits }}</td>
+            {% if user_id == 1 %}
+              <th scope="col">Usuń</th>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
