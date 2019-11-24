@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<head>
+  <title>Filmy</title>
+</head>
+{% endblock %}
+
+{% block body %}
+  <div>
+    <h1>Twoje wyniki wyszukiwania:</h1>
+  </div>
+
+  <div>
+    {% if cinemas %}
+      <table class="table table-striped">
+        <thead class="thead-dark">
+          <tr class="thead-dark">KINA</tr>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nazwa</th>
+            <th scope="col">Adres</th>
+            <th scope="col">Liczba miejsc</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cinema in cinemas %}
+            <tr>
+              <th scope="row">{{ loop.index }}</th>
+              <td><a href="/cinema/{{ cinema.get_cinema_id() }}">{{ cinema.name }}</a></td>
+              <td>{{ cinema.address }}</td>
+              <td>{{ cinema.sits }}</td>
+              {% if user_id == 1 %}
+                <th scope="col">Usuń</th>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+    {% if movies %}
+      <table class="table table-striped">
+        <thead class="thead-dark">
+          <tr>FILMY</tr>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Tytuł</th>
+            <th scope="col">Opis</th>
+            <th scope="col">Ocena</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for movie in movies %}
+            <tr>
+              <th scope="row">{{ loop.index }}</th>
+              <td>{{ movie.title }}</td>
+              <td>{{ movie.description }}</td>
+              <td>{{ movie.rate }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+{% endblock %}
