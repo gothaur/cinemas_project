@@ -23,11 +23,15 @@
       </thead>
       <tbody>
         <form action="#" method="post">
+          <input type="hidden" name="form_name" value="add_movie">
           <tr>
             <th scope="row"><input type="text" name="name"></th>
             <td><input type="text" name="description"></td>
             <td><input type="number" name="rate" step="0.5" min="0" max="10"></td>
-            <td><input type="submit" name="add_movie" value="Dodaj"></td>
+            <td>
+              <button type="submit" class="btn btn-outline-success my-2 my-sm-0"
+                                name="button_name" value="add">Dodaj</button>
+            </td>
           </tr>
         </form>
       </tbody>
@@ -35,31 +39,72 @@
     {% endif %}
   </div>
   <div>
-    <table class="table table-striped">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Tytuł</th>
-          <th scope="col">Opis</th>
-          <th scope="col">Ocena</th>
-          {% if user_id == 1 %}
-            <th scope="col">Akcja</th>
-          {% endif %}
-        </tr>
-      </thead>
-      <tbody>
+<!--    <table class="table table-striped">-->
+<!--      <thead class="thead-dark">-->
+<!--        <tr>-->
+<!--          <th scope="col">#</th>-->
+<!--          <th scope="col">Tytuł</th>-->
+<!--          <th scope="col">Opis</th>-->
+<!--          <th scope="col">Ocena</th>-->
+<!--          {% if user_id == 1 %}-->
+<!--            <th scope="col">Akcja</th>-->
+<!--          {% endif %}-->
+<!--        </tr>-->
+<!--      </thead>-->
+<!--      <tbody>-->
         {% for movie in movies %}
-          <tr>
-            <th scope="row">{{ loop.index }}</th>
-            <td>{{ movie.title }}</td>
-            <td>{{ movie.description }}</td>
-            <td>{{ movie.rate }}</td>
-            {% if user_id == 1 %}
-              <th scope="col">Usuń</th>
-            {% endif %}
-          </tr>
+<!--          <tr>-->
+<!--            <th scope="row">{{ loop.index }}</th>-->
+<!--            <td>{{ movie.title }}</td>-->
+<!--            <td>{{ movie.description }}</td>-->
+<!--            <td>{{ movie.rate }}</td>-->
+<!--            {% if user_id == 1 %}-->
+<!--              <th scope="col">Usuń</th>-->
+<!--            {% endif %}-->
+<!--          </tr>-->
+          <div class="accordion" id="accordionExample">
+            <div class="card">
+              <div class="card-header" id="heading{{ movie.get_movie_id() }}">
+                <h2 class="mb-0">
+                  <button class="btn btn-link" type="button" data-toggle="collapse"
+                          data-target="#collapse{{ movie.get_movie_id() }}" aria-expanded="false"
+                          aria-controls="collapse{{ movie.get_movie_id() }}">
+                    {{ movie.title }}
+                  </button>
+                </h2>
+              </div>
+
+              <div id="collapse{{ movie.get_movie_id() }}" class="collapse"
+                   aria-labelledby="heading{{ movie.get_movie_id() }}"
+                   data-parent="#accordionExample">
+                <div class="card-body">
+                 <div class="row">
+                  <div class="col-9">
+                    {{ movie.description }}
+                  </div>
+                  <div class="col-3">
+                    <div class="btn-group btn-group-sm btn-group-justified">
+                        {% if user_id == 1 %}
+                          <form action="#" method="post">
+                            <input type="hidden" name="form_name" value="delete_movie">
+                            <input type="hidden" name="movie_id" value="{{ movie.get_movie_id() }}">
+                            <button type="submit" class="btn btn-outline-danger"
+                            name="button_name" value="delete">Usuń</button>
+                          </form>
+                          <button type="submit" class="btn btn-outline-primary my-2 my-sm-0"
+                          name="button_name" value="modify">Modyfikuj</button>
+                        {% endif %}
+                        <button type="submit" class="btn btn-outline-success my-2 my-sm-0"
+                                name="button_name" value="check">Sprawdź</button>
+                    </div>
+                  </div>
+                 </div>
+                </div>
+              </div>
+            </div>
+          </div>
         {% endfor %}
-      </tbody>
-    </table>
+<!--      </tbody>-->
+<!--    </table>-->
   </div>
 {% endblock %}

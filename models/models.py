@@ -23,6 +23,12 @@ class Movies:
         self.set_movie_id(cursor.fetchone()[0])
         cursor.close()
 
+    @staticmethod
+    def delete(database_connection, movie_id):
+        cursor = database_connection.cursor()
+        cursor.execute("DELETE FROM Movies WHERE movie_id=%s;", [movie_id])
+        cursor.close()
+
     # @staticmethod
     # def get_all(database_connection, cinema_id=None):
     #     cursor = database_connection.cursor()
@@ -57,6 +63,21 @@ class Movies:
 
         return movies
 
+    @staticmethod
+    def search_by_title(database_connection, title):
+        cursor = database_connection.cursor()
+        title = '%' + title + '%'
+        cursor.execute("SELECT movie_id, title, description, rate FROM Movies "
+                       "WHERE title LIKE %s", [title])
+        movies = []
+        movies_data = cursor.fetchall()
+        for movie_data in movies_data:
+            movie = Movies(movie_data[0], movie_data[1], movie_data[2], movie_data[3])
+            movies.append(movie)
+        cursor.close()
+        if len(movies) > 0:
+            return movies
+
 
 class Cinemas:
 
@@ -89,6 +110,21 @@ class Cinemas:
             cinema = Cinemas(cinema_data[0], cinema_data[1], cinema_data[2], cinema_data[3],)
             cinemas.append(cinema)
         return cinemas
+
+    @staticmethod
+    def search_by_name(database_connection, name):
+        cursor = database_connection.cursor()
+        name = '%' + name + '%'
+        cursor.execute("SELECT cinema_id, name, address, sits FROM Cinemas "
+                       "WHERE name LIKE %s", [name])
+        cinemas = []
+        cinemas_data = cursor.fetchall()
+        for cinema_data in cinemas_data:
+            cinema = Cinemas(cinema_data[0], cinema_data[1], cinema_data[2], cinema_data[3])
+            cinemas.append(cinema)
+        cursor.close()
+        if len(cinemas) > 0:
+            return cinemas
 
 
 class MoviesCinemas:

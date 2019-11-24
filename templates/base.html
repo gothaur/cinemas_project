@@ -31,25 +31,31 @@
         <li class="nav-item">
           <a class="nav-link" href="/login">Logowanie</a>
         </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-             aria-haspopup="true" aria-expanded="false">
-            Dropdown
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="#">Action</a>
-            <a class="dropdown-item" href="#">Another action</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="/logout">Wyloguj</a>
-          </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-        </li>
+        {% if user_id %}
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Zalogowany jako {{ username }}</a>
+          </li>
+        {% endif %}
+        <div class="float-xl-right">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false">
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="#">Action</a>
+              <a class="dropdown-item" href="#">Ustawienia</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="/logout">Wyloguj</a>
+            </div>
+          </li>
+        </div>
       </ul>
-      <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      <form class="form-inline my-2 my-lg-0" action="/search" method="post">
+        <input type="hidden" name="form_name" value="search_form">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"
+               name="search_value">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit"
+                name="button_name" value="search_button">Search</button>
       </form>
     </div>
   </nav>

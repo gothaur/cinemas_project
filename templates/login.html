@@ -1,32 +1,36 @@
 {% extends 'base.html' %}
 
 {% block body %}
-  <form action="#" method="post" class="form-horizontal col-lg-6">
-    <fieldset>
-      <legend>Rejestracja</legend>
-      <div class="form-group">
-        <label for="inputEmail" class="col-lg-2 control-label">Email</label>
-        <div class="col-lg-6">
-          <input type="text" class="form-control" id="inputEmail" name="email" placeholder="Email">
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword" class="col-lg-2 control-label">Hasło</label>
-        <div class="col-lg-6">
-          <input type="password" class="form-control" id="inputPassword" name="password" placeholder="Password">
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="col-lg-6 col-lg-offset-2">
-          <div class="btn-group btn-group-sm btn-group-justified">
-            <button type="reset" class="btn btn-outline-danger">Anuluj</button>
-            <button type="submit" class="btn btn-outline-primary my-2 my-sm-0"
-            name="button_name" value="register">Zarejestruj</button>
-            <button type="submit" class="btn btn-outline-success my-2 my-sm-0"
-                    name="button_name" value="login">Zaloguj</button>
+  {% if not user_id %}
+    <form action="#" method="post" class="form-horizontal col-lg-6">
+      <fieldset>
+        <legend>Rejestracja</legend>
+        <div class="form-group">
+          <label for="inputEmail" class="col-lg-2 control-label">Email</label>
+          <div class="col-lg-6">
+            <input type="text" class="form-control" id="inputEmail" name="email" placeholder="Email">
           </div>
         </div>
-      </div>
-    </fieldset>
-  </form>
+        <div class="form-group">
+          <label for="inputPassword" class="col-lg-2 control-label">Hasło</label>
+          <div class="col-lg-6">
+            <input type="password" class="form-control" id="inputPassword" name="password" placeholder="Password">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-lg-6 col-lg-offset-2">
+            <div class="btn-group btn-group-sm btn-group-justified">
+              <button type="reset" class="btn btn-outline-danger">Anuluj</button>
+              <button type="submit" class="btn btn-outline-primary my-2 my-sm-0"
+              name="button_name" value="register">Zarejestruj</button>
+              <button type="submit" class="btn btn-outline-success my-2 my-sm-0"
+                      name="button_name" value="login">Zaloguj</button>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  {% else %}
+    <div class="mx-auto">Jesteś już zalogowany jako {{ username }}</div>
+  {% endif %}
 {% endblock %}

@@ -10,16 +10,24 @@ app.secret_key = "klucz sekretny"
 @app.route("/", methods=['POST', 'GET'])
 @app.route("/home", methods=['POST', 'GET'])
 def root():
-    return render_template("index.html")
+    if "user_id" in session:
+        return render_template("index.html", username=session["user_name"])
+    else:
+        return render_template("index.html")
 
 
 @app.route("/cinemas", methods=['POST', 'GET'])
 @app.route("/kina", methods=['POST', 'GET'])
 def cinemas():
+    """
+    View of cinemas page
+    :return: cinemas template
+    """
     if request.method == 'GET':
         _cinemas = Cinemas.get_all(connection)
-        if "user" in session:
-            return render_template('cinemas.html', cinemas=_cinemas, user_id=session['user'])
+        if "user_id" in session:
+            return render_template('cinemas.html', cinemas=_cinemas, user_id=session["user_id"],
+                                   username=session["user_name"])
         else:
             return render_template('cinemas.html', cinemas=_cinemas)
     else:
@@ -40,9 +48,9 @@ def cinema(cinema_id):
     if request.method == "GET":
         _movies = Movies.get_all(connection, cinema_id=cinema_id)
         _list_of_movies = Movies.get_all(connection)
-        if "user" in session:
+        if "user_id" in session:
             return render_template("in_cinema.html", movies=_movies, list_of_movies=_list_of_movies,
-                                   user_id=session['user'])
+                                   user_id=session["user_id"], username=session["user_name"])
         else:
             return render_template("in_cinema.html", movies=_movies)
     else:
@@ -59,23 +67,40 @@ def cinema(cinema_id):
 def movies():
     if request.method == "GET":
         _movies = Movies.get_all(connection)
-        if "user" in session:
-            return render_template("movies.html", movies=_movies, user_id=session['user'])
+        if "user_id" in session:
+            return render_template("movies.html", movies=_movies, user_id=session["user_id"],
+                                   username=session["user_name"])
         else:
             return render_template("movies.html", movies=_movies)
     else:
-        name = request.form.get("name")
-        description = request.form.get("description")
-        rate = request.form.get("rate")
-        movie = Movies(None, name, description, rate)
-        movie.add_to_database(connection)
+        button = request.form.get("button_name")
+        form_name = request.form.get("form_name")
+        print(f"button: {button}")
+        print(f"form: {form_name}")
+        if form_name == "add_movie":
+            if button == "add":
+                name = request.form.get("name")
+                description = request.form.get("description")
+                rate = request.form.get("rate")
+                movie = Movies(None, name, description, rate)
+                movie.add_to_database(connection)
+        if form_name == "delete_movie":
+            if button == "delete":
+                _movie_id = request.form.get("movie_id")
+                Movies.delete(connection, _movie_id)
+
         return redirect(url_for("movies"))
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return render_template("login.html")
+        if "user_id" in session:
+            _user_id = session['user_id']
+            # return render_template("login.html", user_id=session['user'])
+            return render_template("login.html", user_id=_user_id, username=session["user_name"])
+        else:
+            return render_template("login.html")
     else:
         email = request.form.get("email")
         password = request.form.get("password")
@@ -83,7 +108,8 @@ def login():
         if button == "login":
             if Users.validate(connection, email, password):
                 user = Users.get_user_by_email(connection, email)
-                session["user"] = user.get_user_id()
+                session["user_id"] = user.get_user_id()
+                session["user_name"] = user.email
                 flash("Zalogowano poprawnie")
                 return redirect("/")
             else:
@@ -99,9 +125,23 @@ def login():
 @app.route("/logout", methods=['POST', 'GET'])
 def logout():
     if request.method == 'GET':
-        if "user" in session:
-            session.pop("user", None)
+        if "user_id" in session:
+            session.pop("user_id", None)
+            session.pop("user_name", None)
         return render_template("index.html")
+
+
+@app.route("/search", methods=['POST', 'GET'])
+def search():
+    # form_name = request.form.get("form_name")
+    # button = request.form.get("button_name")
+    name = request.form.get("search_value")
+    # if button == "search_button":
+    #     print(f"button name: {button}")
+    _list_of_movies = Movies.search_by_title(connection, name)
+    _list_of_cinemas = Cinemas.search_by_name(connection, name)
+    return render_template("search.html", movies=_list_of_movies,
+                           cinemas=_list_of_cinemas)
 
 
 if __name__ == '__main__':
