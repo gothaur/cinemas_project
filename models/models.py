@@ -1,5 +1,4 @@
 from clcrypto import check_password, password_hash
-from psycopg2 import connect, OperationalError
 
 
 class Movies:
@@ -29,19 +28,6 @@ class Movies:
         cursor.execute("DELETE FROM Movies WHERE movie_id=%s;", [movie_id])
         cursor.close()
 
-    # @staticmethod
-    # def get_all(database_connection, cinema_id=None):
-    #     cursor = database_connection.cursor()
-    #     cursor.execute("SELECT movie_id, title, description, rate FROM Movies")
-    #     movies = []
-    #     movies_data = cursor.fetchall()
-    #     for movie_data in movies_data:
-    #         movie = Movies(movie_data[0], movie_data[1], movie_data[2], movie_data[3])
-    #         movies.append(movie)
-    #     cursor.close()
-    #
-    #     return movies
-
     @staticmethod
     def get_all(database_connection, cinema_id=None):
         cursor = database_connection.cursor()
@@ -64,11 +50,19 @@ class Movies:
         return movies
 
     @staticmethod
-    def search_by_title(database_connection, title):
+    def search(database_connection, movie_id=None, title=None):
         cursor = database_connection.cursor()
-        title = '%' + title + '%'
-        cursor.execute("SELECT movie_id, title, description, rate FROM Movies "
-                       "WHERE title LIKE %s", [title])
+        if movie_id:
+            sql = "SELECT movie_id, title, description, rate FROM Movies " \
+                  "WHERE movie_id=%s"
+            value = [movie_id]
+        if title:
+            title = '%' + title + '%'
+            sql = "SELECT movie_id, title, description, rate FROM Movies " \
+                  "WHERE LOWER (title) LIKE LOWER (%s)"
+            value = [title]
+
+        cursor.execute(sql, value)
         movies = []
         movies_data = cursor.fetchall()
         for movie_data in movies_data:
@@ -101,9 +95,15 @@ class Cinemas:
         cursor.close()
 
     @staticmethod
-    def get_all(database_connection):
+    def get_all(database_connection, cinema_id=False):
         cursor = database_connection.cursor()
-        cursor.execute("SELECT cinema_id, name, address, sits FROM Cinemas")
+
+        if cinema_id:
+            sql = "SELECT cinema_id, name, address, sits FROM Cinemas WHERE cinema_id=%s"
+        else:
+            sql = "SELECT cinema_id, name, address, sits FROM Cinemas"
+
+        cursor.execute(sql, [cinema_id])
         cinemas = []
         cinemas_data = cursor.fetchall()
         for cinema_data in cinemas_data:
@@ -116,7 +116,7 @@ class Cinemas:
         cursor = database_connection.cursor()
         name = '%' + name + '%'
         cursor.execute("SELECT cinema_id, name, address, sits FROM Cinemas "
-                       "WHERE name LIKE %s", [name])
+                       "WHERE LOWER (name) LIKE LOWER (%s)", [name])
         cinemas = []
         cinemas_data = cursor.fetchall()
         for cinema_data in cinemas_data:
@@ -135,11 +135,41 @@ class MoviesCinemas:
         self.cinema_id = cinema_id
         self.date = date
 
+    def get_pic_id(self):
+        return self._pic_id
+
     def add(self, database_connection):
         cursor = database_connection.cursor()
         cursor.execute("INSERT INTO Movies_Cinemas(movie_id, cinema_id, date) VALUES (%s, %s, %s)"
                        "RETURNING pic_id", [self.movie_id, self.cinema_id, self.date])
         self._pic_id = cursor.fetchone()[0]
+        cursor.close()
+
+    @staticmethod
+    def get_all(database_connection, cinema_id=None, movie_id=None):
+        cursor = database_connection.cursor()
+        if cinema_id:
+            sql = "SELECT Movies_Cinemas.pic_id, Movies.title, Cinemas.sits, Movies_Cinemas.date " \
+                  "FROM Movies_Cinemas " \
+                  "JOIN Cinemas ON Movies_Cinemas.cinema_id=Cinemas.cinema_id " \
+                  "JOIN Movies ON Movies_Cinemas.movie_id=Movies.movie_id " \
+                  "WHERE Movies_Cinemas.cinema_id=%s"
+            value = [cinema_id]
+        cursor.execute(sql, value)
+        movies_cinemas = []
+        movies_cinemas_data = cursor.fetchall()
+        for movie_cinema__data in movies_cinemas_data:
+            movie = MoviesCinemas(movie_cinema__data[0], movie_cinema__data[1],
+                                  movie_cinema__data[2], movie_cinema__data[3])
+            movies_cinemas.append(movie)
+        cursor.close()
+
+        return movies_cinemas
+
+    @staticmethod
+    def delete(database_connection, pic_id):
+        cursor = database_connection.cursor()
+        cursor.execute("DELETE FROM Movies_Cinemas WHERE pic_id=%s", [pic_id])
         cursor.close()
 
 

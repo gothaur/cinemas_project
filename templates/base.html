@@ -43,9 +43,11 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Ustawienia</a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="/logout">Wyloguj</a>
+              {% if user_id %}
+                <a class="dropdown-item" href="#">Ustawienia</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/logout">Wyloguj</a>
+              {% endif %}
             </div>
           </li>
         </div>

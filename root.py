@@ -46,19 +46,28 @@ def cinemas():
 @app.route("/kino/<int:cinema_id>", methods=["POST", "GET"])
 def cinema(cinema_id):
     if request.method == "GET":
-        _movies = Movies.get_all(connection, cinema_id=cinema_id)
-        _list_of_movies = Movies.get_all(connection)
+        # _movies = Movies.get_all(connection, cinema_id=cinema_id)
+        _movies_cinemas = MoviesCinemas.get_all(connection, cinema_id=cinema_id)
+        _list_of_all_movies = Movies.get_all(connection)
+        _cinema = Cinemas.get_all(connection, cinema_id)
         if "user_id" in session:
-            return render_template("in_cinema.html", movies=_movies, list_of_movies=_list_of_movies,
-                                   user_id=session["user_id"], username=session["user_name"])
+            return render_template("in_cinema.html", cinema=_cinema[0], movies_cinemas=_movies_cinemas,
+                                   list_of_all_movies=_list_of_all_movies, user_id=session["user_id"],
+                                   username=session["user_name"])
         else:
-            return render_template("in_cinema.html", movies=_movies)
+            return render_template("in_cinema.html", cinema=_cinema[0], movies_cinemas=_movies_cinemas)
     else:
+        form_name = request.form.get("form_name")
         _cinema_id = cinema_id
-        _movie_id = request.form.get('movie_id')
-        _date = request.form.get("datetime")
-        movie_cinema = MoviesCinemas(None, _movie_id, _cinema_id, _date)
-        movie_cinema.add(connection)
+        button = request.form.get("button_name")
+        if form_name == "delete_movie_from_cinema":
+            if button == "delete_from_cinema":
+                MoviesCinemas.delete(connection, request.form.get('pic_id'))
+        else:
+            _movie_id = request.form.get('movie_id')
+            _date = request.form.get("datetime")
+            movie_cinema = MoviesCinemas(None, _movie_id, _cinema_id, _date)
+            movie_cinema.add(connection)
         return redirect(f"/cinema/{cinema_id}")
 
 
@@ -133,12 +142,8 @@ def logout():
 
 @app.route("/search", methods=['POST', 'GET'])
 def search():
-    # form_name = request.form.get("form_name")
-    # button = request.form.get("button_name")
     name = request.form.get("search_value")
-    # if button == "search_button":
-    #     print(f"button name: {button}")
-    _list_of_movies = Movies.search_by_title(connection, name)
+    _list_of_movies = Movies.search(connection, title=name)
     _list_of_cinemas = Cinemas.search_by_name(connection, name)
     return render_template("search.html", movies=_list_of_movies,
                            cinemas=_list_of_cinemas)
